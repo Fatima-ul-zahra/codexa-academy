@@ -5,10 +5,12 @@ const { generateToken } = require("../utils/auth");
 
 const COOKIE_NAME = "codexa_token";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax",
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
   maxAge: 24 * 60 * 60 * 1000,
   path: "/",
 };
@@ -62,13 +64,9 @@ const login = async (req, res, next) => {
 
     const token = generateToken(admin._id.toString());
 
-    res.cookie(
-      COOKIE_NAME,
-      token,
-      cookieOptions
-    );
+    res.cookie(COOKIE_NAME, token, cookieOptions);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Login successful.",
       data: {
@@ -92,12 +90,12 @@ const logout = async (req, res, next) => {
   try {
     res.clearCookie(COOKIE_NAME, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
       path: "/",
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Logout successful.",
     });
@@ -114,7 +112,7 @@ const logout = async (req, res, next) => {
 
 const getMe = async (req, res, next) => {
   try {
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: {
         id: req.admin._id,
