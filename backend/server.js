@@ -34,14 +34,24 @@ connectDB();
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin:
+      process.env.CLIENT_URL ||
+      "http://localhost:5173",
     credentials: true,
   })
 );
 
-app.use(express.json({ limit: "1mb" }));
+app.use(
+  express.json({
+    limit: "1mb",
+  })
+);
 
-app.use(express.urlencoded({ extended: true }));
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 
 app.use(cookieParser());
 
@@ -67,8 +77,16 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 
 app.use("/api/courses", courseRoutes);
-app.use("/api/dashboard",dashboardRoutes);
-app.use("/api/enrollments",enrollmentRoutes);
+
+app.use(
+  "/api/dashboard",
+  dashboardRoutes
+);
+
+app.use(
+  "/api/enrollments",
+  enrollmentRoutes
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -82,14 +100,35 @@ app.use(errorHandler);
 
 /*
 |--------------------------------------------------------------------------
-| Server
+| Local Development Server
+|--------------------------------------------------------------------------
+|
+| When running:
+| npm run dev
+| npm start
+|
+| the Express server will listen normally.
+|
+| When Netlify imports this file as a function,
+| app.listen() will NOT run.
+|
 |--------------------------------------------------------------------------
 */
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(
-    `Codexa Academy API running on port ${PORT}`
-  );
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(
+      `Codexa Academy API running on port ${PORT}`
+    );
+  });
+}
+
+/*
+|--------------------------------------------------------------------------
+| Export Express App
+|--------------------------------------------------------------------------
+*/
+
+module.exports = app;
